@@ -9,7 +9,8 @@
   <!-- Custom styles -->
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="h-screen flex flex-col overflow-hidden bg-gray-100" id="app-container">
+<body class="min-h-screen bg-gray-100 flex justify-center">
+<div id="app-container" class="h-screen w-full max-w-[600px] lg:max-w-[90%] xl:max-w-[1500px] flex flex-col overflow-hidden bg-white shadow-lg border-x border-gray-200">
   <!-- Navigation bar - fixed height -->
   <nav class="flex-none bg-white shadow-sm border-b z-20">
     <div class="flex items-center h-12 px-3">
@@ -31,9 +32,9 @@
   <div id="errorContainer" class="w-full flex-none"></div>
   
   <!-- Main content area - fills remaining space -->
-  <div class="flex flex-col flex-grow overflow-hidden">
-    <!-- Video section - controlled max height -->
-    <div id="videoSection" class="flex-none bg-white w-full max-h-[40vh]">
+  <div class="flex flex-col lg:flex-row flex-grow overflow-hidden">
+    <!-- Video section -->
+    <div id="videoSection" class="flex-none lg:flex-1 bg-white w-full max-h-[40vh] lg:max-h-none lg:h-auto">
       <!-- Video placeholder/player with responsive sizing -->
       <div id="player" class="w-full aspect-video bg-gray-100 flex items-center justify-center max-h-full">
         <!-- Initial state with input directly in video container -->
@@ -51,7 +52,7 @@
     </div>
     
     <!-- Lyrics section - fills remaining space -->
-    <div id="lyricsSection" class="flex-grow flex flex-col overflow-hidden">
+    <div id="lyricsSection" class="flex-grow flex flex-col overflow-hidden lg:flex-1 lg:border-l lg:max-w-[500px]">
       <!-- Lyrics search container -->
       <div id="lyricsSearch" class="bg-white border-t hidden h-full flex flex-col">
         <!-- Search input directly in lyrics container - fixed height -->
@@ -92,5 +93,6 @@
   
   <!-- Main application script -->
   <script src="app.js"></script>
+</div>
 </body>
 </html>

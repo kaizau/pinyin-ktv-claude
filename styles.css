@@ -23,13 +23,13 @@
 
 /* Pinyin styling */
 .pinyin-text {
-  font-size: 0.9rem; /* Increased from 0.75rem */
+  font-size: 1rem; /* Further increased size */
   color: #6b7280; /* gray-500 */
   line-height: 1.3;
 }
 
 .chinese-text {
-  font-size: 1rem;
+  font-size: 1.125rem; /* Also slightly larger */
   font-weight: 500;
   line-height: 1.5;
 }
@@ -145,46 +145,5 @@ iframe {
   }
 }
 
-/* Mobile and tablet view - centered with max width */
-@media (max-width: 1023px) {
-  body {
-    max-width: 600px;
-    margin: 0 auto;
-    border-left: 1px solid #e5e7eb;
-    border-right: 1px solid #e5e7eb;
-  }
-}
-
-/* Desktop layout with side-by-side view */
-@media (min-width: 1024px) {
-  /* Main container becomes row layout on desktop */
-  .flex-col.flex-grow {
-    flex-direction: row !important;
-  }
-  
-  /* Video section takes left side */
-  #videoSection {
-    flex: 1 1 60%;
-    max-height: none !important;
-    height: auto;
-  }
-  
-  /* Lyrics section takes right side */
-  #lyricsSection {
-    flex: 1 1 40%;
-    border-left: 1px solid #e5e7eb;
-  }
-  
-  /* Allow player to be taller on desktop */
-  #player {
-    max-height: calc(100vh - 48px) !important;
-  }
-}
-
-/* Max width for very large screens */
-@media (min-width: 1500px) {
-  body {
-    max-width: 1500px;
-    margin: 0 auto;
-  }
-}
+/* No responsive layout CSS here - using Tailwind for all layout */
+/* Only keeping custom styling for elements and components */
