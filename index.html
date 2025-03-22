@@ -51,8 +51,10 @@
     <!-- Video section -->
     <div id="videoSection" class="flex-none lg:flex-1 bg-white w-full max-h-[40vh] lg:max-h-none lg:h-auto">
       <!-- Video placeholder/player with responsive sizing -->
-      <div id="player" class="w-full aspect-video bg-gray-100 flex items-center justify-center max-h-full">
-        <!-- Initial state with input directly in video container -->
+      <div id="playerContainer" class="w-full aspect-video bg-gray-100 flex items-center justify-center max-h-full">
+        <!-- Player will be created here -->
+        <div id="player"></div>
+        <!-- Initial state with input -->
         <div id="videoInput" class="text-center p-4 w-full max-w-md">
           <h1 class="text-xl font-bold text-gray-700 mb-4">YouTube Pinyin Karaoke</h1>
           <div class="flex flex-col gap-2">

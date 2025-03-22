@@ -53,8 +53,11 @@ function createYouTubePlayer(videoId) {
     return;
   }
 
-  // Clear the videoInput content
+  // Make sure the player div is empty
   document.getElementById('player').innerHTML = '';
+  
+  // Hide the video input and show the player
+  videoInput.classList.add('hidden');
 
   player = new YT.Player('player', {
     height: '100%',
@@ -190,8 +193,12 @@ function goToStep(step) {
       // Update active nav item
       navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
       
-      // Show video input, hide other sections
-      videoInput.classList.remove('hidden');
+      // If player doesn't exist, show the video input form
+      if (!player) {
+        videoInput.classList.remove('hidden');
+      }
+      
+      // Hide other sections
       lyricsSearch.classList.add('hidden');
       lyricsView.classList.add('hidden');
       
@@ -408,6 +415,7 @@ loadVideoButton.addEventListener('click', async () => {
   }
   
   // Show loading indicator
+  const originalInput = videoInput.innerHTML;
   videoInput.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div><div class="ml-3">Loading video...</div></div>';
   
   try {
@@ -420,8 +428,28 @@ loadVideoButton.addEventListener('click', async () => {
       lyricsView.innerHTML = '';
     }
     
+    // If there's an existing player, destroy it
+    if (player) {
+      player.destroy();
+      player = undefined;
+    }
+    
+    // Restore original input form first (but it will be hidden by createYouTubePlayer)
+    videoInput.innerHTML = originalInput;
+    
+    // Get the fresh references again
+    const newYoutubeUrlInput = document.getElementById('youtubeUrl');
+    const newLoadVideoButton = document.getElementById('loadVideo');
+    
+    // Set the URL value
+    newYoutubeUrlInput.value = youtubeUrl;
+    
     // Create YouTube player
     createYouTubePlayer(videoId);
+    
+    // Reattach event listeners
+    newLoadVideoButton.addEventListener('click', loadVideoButton.onclick);
+    newYoutubeUrlInput.addEventListener('keypress', youtubeUrlInput.onkeypress);
     
     // Populate artist/song field and move to lyrics step
     artistSongInput.value = metadata.title || '';
@@ -431,19 +459,18 @@ loadVideoButton.addEventListener('click', async () => {
   } catch (error) {
     showError('Error loading video: ' + error.message, 'errorContainer');
     // Restore video input
-    videoInput.innerHTML = `
-      <h1 class="text-xl font-bold text-gray-700 mb-4">YouTube Pinyin Karaoke</h1>
-      <div class="flex flex-col gap-2">
-        <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border rounded" 
-          placeholder="Enter YouTube URL..." value="${youtubeUrl}">
-        <button id="loadVideo" class="bg-blue-500 text-white py-2 px-3 rounded text-sm">
-          Load Video
-        </button>
-      </div>
-    `;
-    // Need to reattach the event listeners
-    document.getElementById('loadVideo').addEventListener('click', loadVideoButton.onclick);
-    document.getElementById('youtubeUrl').addEventListener('keypress', youtubeUrlInput.onkeypress);
+    videoInput.innerHTML = originalInput;
+    
+    // Get the fresh references again
+    const newYoutubeUrlInput = document.getElementById('youtubeUrl');
+    const newLoadVideoButton = document.getElementById('loadVideo');
+    
+    // Set the URL value
+    newYoutubeUrlInput.value = youtubeUrl;
+    
+    // Reattach event listeners
+    newLoadVideoButton.addEventListener('click', loadVideoButton.onclick);
+    newYoutubeUrlInput.addEventListener('keypress', youtubeUrlInput.onkeypress);
   }
 });
 
@@ -474,10 +501,19 @@ searchLyricsButton.addEventListener('click', () => {
 // Navigation between steps
 navVideo.addEventListener('click', () => {
   if (!navVideo.classList.contains('disabled')) {
-    // If we're on the player step and going back to video, clear everything
-    if (currentStep === 'player') {
+    // Clear everything when going back to video
+    if (currentStep === 'player' || currentStep === 'lyrics') {
       currentLyrics = [];
       lyricsView.innerHTML = '';
+      
+      // Clear the player if it exists
+      if (player) {
+        player.destroy();
+        player = undefined;
+      }
+      
+      // Show the video input form
+      videoInput.classList.remove('hidden');
     }
     
     goToStep('video');
