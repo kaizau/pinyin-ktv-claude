@@ -29,7 +29,11 @@ function refreshElementReferences() {
   loadVideoButton = document.getElementById('loadVideo');
   artistSongInput = document.getElementById('artistSong'); 
   searchLyricsButton = document.getElementById('searchLyrics');
+  themeToggleButton = document.getElementById('themeToggle');
 }
+
+// Get theme toggle button reference
+let themeToggleButton = document.getElementById('themeToggle');
 
 // Initialize YouTube API
 function onYouTubeIframeAPIReady() {
@@ -151,7 +155,7 @@ function updateCurrentLyric() {
     const lyricElements = lyricsView.querySelectorAll('div[data-time]');
     lyricElements.forEach((el, index) => {
       if (index === currentIndex) {
-        el.classList.add('active', 'bg-yellow-100/70', 'border-amber-400');
+        el.classList.add('active', 'bg-yellow-100/70', 'dark:bg-yellow-900/50', 'border-amber-400', 'dark:border-amber-600');
         el.querySelector('div:last-child').classList.add('font-bold');
         
         // Use scrollIntoView for simpler, more reliable scrolling
@@ -160,9 +164,9 @@ function updateCurrentLyric() {
           block: 'center' // Center the element vertically
         });
       } else {
-        el.classList.remove('active', 'bg-yellow-100/70', 'border-amber-400');
+        el.classList.remove('active', 'bg-yellow-100/70', 'dark:bg-yellow-900/50', 'border-amber-400', 'dark:border-amber-600');
         el.querySelector('div:last-child').classList.remove('font-bold');
-        el.classList.remove('bg-gray-100/70', 'translate-x-0.5');
+        el.classList.remove('bg-gray-100/70', 'dark:bg-gray-700/70', 'translate-x-0.5');
       }
     });
     
@@ -322,11 +326,11 @@ function displayLyricsWithPinyin(lyrics) {
     lineElement.className = 'px-2 py-1 mb-2 rounded cursor-pointer transition-all duration-200 border-l-4 border-transparent animate-fade-in relative';
     
     const pinyinElement = document.createElement('div');
-    pinyinElement.className = 'text-base text-gray-500 leading-snug';
+    pinyinElement.className = 'text-base text-gray-500 dark:text-gray-400 leading-snug transition-colors duration-300';
     pinyinElement.textContent = convertToPinyin(line.text);
     
     const chineseElement = document.createElement('div');
-    chineseElement.className = 'text-lg font-medium leading-relaxed tracking-widest';
+    chineseElement.className = 'text-lg font-medium leading-relaxed tracking-widest text-gray-800 dark:text-gray-200 transition-colors duration-300';
     chineseElement.textContent = line.text;
     
     lineElement.appendChild(pinyinElement);
@@ -335,12 +339,12 @@ function displayLyricsWithPinyin(lyrics) {
     
     // Add hover effect with JS since we can't use CSS
     lineElement.addEventListener('mouseenter', () => {
-      lineElement.classList.add('bg-gray-100/70', 'translate-x-0.5');
+      lineElement.classList.add('bg-gray-100/70', 'dark:bg-gray-700/70', 'translate-x-0.5');
     });
     
     lineElement.addEventListener('mouseleave', () => {
       if (!lineElement.classList.contains('active')) {
-        lineElement.classList.remove('bg-gray-100/70', 'translate-x-0.5');
+        lineElement.classList.remove('bg-gray-100/70', 'dark:bg-gray-700/70', 'translate-x-0.5');
       }
     });
     
@@ -369,32 +373,32 @@ function displaySearchResults(results) {
   searchResults.innerHTML = '';
   
   if (results.length === 0) {
-    searchResults.innerHTML = '<p class="text-gray-500 p-4 text-center text-sm">No lyrics found. Try a different search term.</p>';
+    searchResults.innerHTML = '<p class="text-gray-500 dark:text-gray-400 p-4 text-center text-sm transition-colors duration-300">No lyrics found. Try a different search term.</p>';
     return;
   }
   
   // Add results header
   const headerElement = document.createElement('div');
-  headerElement.className = 'text-xs text-gray-500 px-2 py-1 bg-gray-50';
+  headerElement.className = 'text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-700 transition-colors duration-300';
   headerElement.textContent = `${results.length} results found`;
   searchResults.appendChild(headerElement);
   
   // Add each result
   results.forEach(result => {
     const resultElement = document.createElement('div');
-    resultElement.className = 'p-2 border-b border-gray-200 cursor-pointer animate-fade-in hover:bg-gray-50 transition-colors duration-100';
+    resultElement.className = 'p-2 border-b border-gray-200 dark:border-gray-700 cursor-pointer animate-fade-in hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-300';
     
     const artistName = result.artistName || 'Unknown Artist';
     const trackName = result.trackName || 'Unknown Song';
     
     resultElement.innerHTML = `
-      <div class="font-medium text-sm">${artistName}</div>
-      <div class="text-sm text-gray-700">${trackName}</div>
+      <div class="font-medium text-sm text-gray-800 dark:text-gray-200 transition-colors duration-300">${artistName}</div>
+      <div class="text-sm text-gray-700 dark:text-gray-400 transition-colors duration-300">${trackName}</div>
     `;
     
     resultElement.addEventListener('click', async () => {
       // Show loading indicator
-      lyricsView.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div></div>';
+      lyricsView.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 dark:border-blue-400"></div></div>';
       
       // Enable player nav
       navPlayer.classList.remove('disabled');
@@ -404,7 +408,7 @@ function displaySearchResults(results) {
         const parsedLyrics = parseLyrics(fullLyrics.syncedLyrics);
         displayLyricsWithPinyin(parsedLyrics);
       } catch (error) {
-        lyricsView.innerHTML = '<p class="text-red-500 text-center p-4 text-sm">Error loading lyrics. Please try again.</p>';
+        lyricsView.innerHTML = '<p class="text-red-500 dark:text-red-400 text-center p-4 text-sm transition-colors duration-300">Error loading lyrics. Please try again.</p>';
         goToStep('lyrics');
       }
     });
@@ -599,12 +603,39 @@ artistSongInput.addEventListener('keypress', (e) => {
   }
 });
 
+// Handle dark/light mode
+function initializeTheme() {
+  // Check for system preference
+  if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    document.documentElement.classList.add('dark');
+  }
+  
+  // Add event listener for system preference change
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+    if (event.matches) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  });
+  
+  // Add click handler for theme toggle button
+  if (themeToggleButton) {
+    themeToggleButton.addEventListener('click', () => {
+      document.documentElement.classList.toggle('dark');
+    });
+  }
+}
+
 // Initialize the UI
 document.addEventListener('DOMContentLoaded', () => {
   // Reset application state
   player = undefined;
   currentLyrics = [];
   timeOffset = 0;
+  
+  // Initialize theme
+  initializeTheme();
   
   // Set initial UI state
   updateNavState();
