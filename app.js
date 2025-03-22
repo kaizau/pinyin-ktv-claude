@@ -13,9 +13,7 @@ const searchLyricsButton = document.getElementById('searchLyrics');
 const lyricsSearch = document.getElementById('lyricsSearch');
 const searchResults = document.getElementById('searchResults');
 const lyricsView = document.getElementById('lyricsView');
-const playbackControls = document.getElementById('playbackControls');
-const adjustEarlierButton = document.getElementById('adjustEarlier');
-const adjustLaterButton = document.getElementById('adjustLater');
+// playbackControls references removed
 const currentTimeDisplay = document.getElementById('currentTime');
 
 // Navigation links
@@ -67,7 +65,8 @@ function createYouTubePlayer(videoId) {
       controls: 1,
       playsinline: 1, // Better for mobile
       rel: 0,         // Don't show related videos
-      modestbranding: 1 // Reduce YouTube branding
+      modestbranding: 1, // Reduce YouTube branding
+      fs: 1           // Allow fullscreen
     },
     events: {
       'onReady': onPlayerReady,
@@ -173,7 +172,6 @@ function goToStep(step) {
       
       // Hide player controls
       currentTimeDisplay.classList.add('hidden');
-      playbackControls.classList.add('hidden');
       break;
       
     case 'lyrics':
@@ -189,7 +187,6 @@ function goToStep(step) {
       
       // Hide player controls
       currentTimeDisplay.classList.add('hidden');
-      playbackControls.classList.add('hidden');
       
       // Prefill and auto-search if we have a title
       if (artistSongInput.value.trim()) {
@@ -210,7 +207,6 @@ function goToStep(step) {
       
       // Show player controls
       currentTimeDisplay.classList.remove('hidden');
-      playbackControls.classList.remove('hidden');
       break;
   }
 }
@@ -455,16 +451,7 @@ navPlayer.addEventListener('click', () => {
 
 // Navigation is now fully handled by the top nav buttons
 
-// Timing adjustment controls
-adjustEarlierButton.addEventListener('click', () => {
-  timeOffset -= 0.5;
-  updateCurrentLyric();
-});
-
-adjustLaterButton.addEventListener('click', () => {
-  timeOffset += 0.5;
-  updateCurrentLyric();
-});
+// Removed timing adjustment buttons
 
 // Enter key for forms
 youtubeUrlInput.addEventListener('keypress', (e) => {
