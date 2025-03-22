@@ -10,87 +10,95 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col">
-  <!-- Top toolbar - always visible, changes context -->
-  <div class="sticky top-0 z-20 bg-white shadow-md">
-    <!-- Error messages container - positioned above toolbar -->
-    <div id="errorContainer" class="w-full"></div>
-    
-    <!-- Breadcrumb-style toolbar -->
-    <div class="toolbar flex items-center h-12 px-2 border-b">
-      <!-- Step indicators -->
-      <div class="steps flex items-center text-xs text-gray-500 flex-shrink-0">
-        <span id="stepVideo" class="step active">1. Video</span>
-        <span class="mx-1">›</span>
-        <span id="stepLyrics" class="step">2. Lyrics</span>
-        <span class="mx-1">›</span>
-        <span id="stepPlayer" class="step">3. Player</span>
+  <!-- Navigation bar -->
+  <nav class="sticky top-0 z-20 bg-white shadow-sm border-b">
+    <div class="flex items-center h-12 px-3">
+      <!-- Steps as nav links -->
+      <div class="steps flex items-center text-xs">
+        <button id="navVideo" class="nav-link active">Video</button>
+        <span class="mx-1 text-gray-300">›</span>
+        <button id="navLyrics" class="nav-link disabled">Lyrics</button>
+        <span class="mx-1 text-gray-300">›</span>
+        <button id="navPlayer" class="nav-link disabled">Player</button>
       </div>
       
       <!-- Current time display -->
-      <span id="currentTime" class="text-xs text-gray-500 ml-2 hidden">0:00</span>
+      <span id="currentTime" class="text-xs text-gray-500 ml-auto hidden">0:00</span>
       
-      <!-- Flexible space -->
-      <div class="flex-grow"></div>
-      
-      <!-- Timing adjustment controls (hidden initially) -->
-      <div id="playbackControls" class="hidden">
+      <!-- Timing adjustment controls (only shown in player mode) -->
+      <div id="playbackControls" class="ml-2 hidden">
         <button id="adjustEarlier" class="text-xs bg-gray-200 py-1 px-2 rounded">-0.5s</button>
         <button id="adjustLater" class="text-xs bg-gray-200 py-1 px-2 rounded ml-1">+0.5s</button>
       </div>
     </div>
-    
-    <!-- Context-specific toolbars - only one visible at a time -->
-    <div id="videoToolbar" class="input-toolbar flex items-center p-2 border-b">
-      <input type="text" id="youtubeUrl" class="flex-grow p-2 text-sm border rounded" placeholder="Enter YouTube URL...">
-      <button id="loadVideo" class="bg-blue-500 text-white py-2 px-3 rounded text-sm ml-2">Load</button>
-    </div>
-    
-    <div id="lyricsToolbar" class="input-toolbar flex items-center p-2 border-b hidden">
-      <button id="backToVideo" class="bg-gray-200 text-gray-700 py-2 px-3 rounded text-sm">Back</button>
-      <input type="text" id="artistSong" class="flex-grow p-2 text-sm border rounded mx-2" placeholder="Artist / Song name">
-      <button id="searchLyrics" class="bg-green-500 text-white py-2 px-3 rounded text-sm">Search</button>
-    </div>
-    
-    <div id="playerToolbar" class="input-toolbar flex items-center p-2 border-b hidden">
-      <button id="backToLyrics" class="bg-gray-200 text-gray-700 py-2 px-3 rounded text-sm">Back</button>
-      
-      <!-- Tabs for lyrics/search -->
-      <div class="flex ml-2">
-        <button id="searchTab" class="py-1 px-2 text-xs font-medium text-gray-500 rounded">Results</button>
-        <button id="lyricsTab" class="py-1 px-2 text-xs font-medium text-blue-500 bg-blue-50 rounded ml-1">Lyrics</button>
-      </div>
-    </div>
-  </div>
+  </nav>
+  
+  <!-- Error messages container -->
+  <div id="errorContainer" class="w-full"></div>
   
   <!-- Main content area -->
-  <div class="flex-grow flex flex-col overflow-hidden">
-    <!-- YouTube video container -->
-    <div id="videoContainer" class="bg-white w-full">
-      <div id="player" class="w-full aspect-video bg-gray-200 flex items-center justify-center">
-        <div class="text-center">
-          <h1 class="text-xl font-bold text-gray-700">YouTube Pinyin Karaoke</h1>
-          <p class="text-gray-500 text-sm">Enter a URL above to get started</p>
+  <div class="flex-grow flex flex-col">
+    <!-- Video section - always visible -->
+    <section id="videoSection" class="bg-white w-full">
+      <!-- Video placeholder/player -->
+      <div id="player" class="w-full aspect-video bg-gray-100 flex items-center justify-center">
+        <!-- Initial state with input directly in video container -->
+        <div id="videoInput" class="text-center p-4 w-full max-w-md">
+          <h1 class="text-xl font-bold text-gray-700 mb-4">YouTube Pinyin Karaoke</h1>
+          <div class="flex flex-col gap-2">
+            <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border rounded" 
+              placeholder="Enter YouTube URL...">
+            <button id="loadVideo" class="bg-blue-500 text-white py-2 px-3 rounded text-sm">
+              Load Video
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
     
-    <!-- Content panels - only one visible at a time -->
-    <div class="flex-grow overflow-hidden">
-      <!-- Lyrics panel -->
-      <div id="lyricsPanel" class="bg-white hidden h-full">
-        <!-- Search results view -->
-        <div id="searchResults" class="overflow-y-auto p-2 h-full">
-          <!-- Search results will be populated here -->
+    <!-- Lyrics section -->
+    <section id="lyricsSection" class="flex-grow overflow-hidden">
+      <!-- Lyrics search container -->
+      <div id="lyricsSearch" class="bg-white border-t hidden">
+        <!-- Search input directly in lyrics container -->
+        <div class="p-3 border-b">
+          <div class="flex gap-2">
+            <input type="text" id="artistSong" class="flex-grow p-2 text-sm border rounded" 
+              placeholder="Enter artist or song name">
+            <button id="searchLyrics" class="bg-green-500 text-white py-2 px-3 rounded text-sm whitespace-nowrap">
+              Search
+            </button>
+          </div>
         </div>
         
-        <!-- Lyrics view (initially hidden) -->
-        <div id="lyricsView" class="hidden overflow-y-auto p-2 h-full">
-          <!-- Lyrics with pinyin will be displayed here -->
+        <!-- Search results -->
+        <div id="searchResults" class="overflow-y-auto p-2">
+          <!-- Results will be loaded here -->
+          <div class="text-center text-gray-500 text-sm p-4">
+            Enter search terms above to find lyrics
+          </div>
         </div>
       </div>
-    </div>
+      
+      <!-- Lyrics display container -->
+      <div id="lyricsView" class="bg-white border-t hidden overflow-y-auto p-3 h-full">
+        <!-- Lyrics with pinyin will be displayed here -->
+      </div>
+    </section>
   </div>
-
+  
+  <!-- Tab bar for switching between search and lyrics (only in player mode) -->
+  <footer id="tabBar" class="bg-white border-t hidden">
+    <div class="flex">
+      <button id="searchTab" class="flex-1 py-3 text-xs font-medium text-gray-500">
+        Search Results
+      </button>
+      <button id="lyricsTab" class="flex-1 py-3 text-xs font-medium text-blue-500 bg-blue-50">
+        Lyrics
+      </button>
+    </div>
+  </footer>
+  
   <!-- Loading YouTube iFrame API -->
   <script src="https://www.youtube.com/iframe_api"></script>
   

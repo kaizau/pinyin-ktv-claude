@@ -41,24 +41,31 @@
   background-color: #f9fafb;
 }
 
-/* Toolbar styling */
-.toolbar {
-  width: 100%;
-}
-
-.step {
+/* Navigation styling */
+.nav-link {
+  padding: 0.5rem;
   opacity: 0.6;
   transition: all 0.2s ease;
+  border-radius: 0.25rem;
+  font-weight: 500;
+  color: #6b7280; /* gray-500 */
 }
 
-.step.active {
+.nav-link.active {
   opacity: 1;
   font-weight: 600;
   color: #3b82f6; /* blue-500 */
 }
 
-.input-toolbar {
-  transition: all 0.3s ease;
+.nav-link.disabled {
+  opacity: 0.4;
+  cursor: default;
+  color: #9ca3af; /* gray-400 */
+}
+
+/* Content section transitions */
+#videoInput, #lyricsSearch, #lyricsView {
+  transition: opacity 0.3s ease;
 }
 
 /* Fade in animations */
@@ -71,14 +78,11 @@
   animation: fadeIn 0.3s ease-in;
 }
 
-/* Slide animations for toolbars */
-@keyframes slideInDown {
-  from { transform: translateY(-100%); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
-
-.slide-in {
-  animation: slideInDown 0.2s ease-out;
+/* Input focus styles */
+input:focus {
+  outline: none;
+  border-color: #93c5fd; /* blue-300 */
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 /* Hide scrollbars on some browsers but keep functionality */

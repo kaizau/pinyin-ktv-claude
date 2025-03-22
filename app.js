@@ -7,29 +7,24 @@ let currentStep = 'video'; // Tracks current step: 'video', 'lyrics', or 'player
 // DOM elements
 const youtubeUrlInput = document.getElementById('youtubeUrl');
 const loadVideoButton = document.getElementById('loadVideo');
+const videoInput = document.getElementById('videoInput');
 const artistSongInput = document.getElementById('artistSong');
 const searchLyricsButton = document.getElementById('searchLyrics');
-const backToVideoButton = document.getElementById('backToVideo');
-const backToLyricsButton = document.getElementById('backToLyrics');
-const lyricsPanel = document.getElementById('lyricsPanel');
-const searchTab = document.getElementById('searchTab');
-const lyricsTab = document.getElementById('lyricsTab');
+const lyricsSearch = document.getElementById('lyricsSearch');
 const searchResults = document.getElementById('searchResults');
 const lyricsView = document.getElementById('lyricsView');
+const tabBar = document.getElementById('tabBar');
+const searchTab = document.getElementById('searchTab');
+const lyricsTab = document.getElementById('lyricsTab');
 const playbackControls = document.getElementById('playbackControls');
 const adjustEarlierButton = document.getElementById('adjustEarlier');
 const adjustLaterButton = document.getElementById('adjustLater');
 const currentTimeDisplay = document.getElementById('currentTime');
 
-// Step indicators
-const stepVideo = document.getElementById('stepVideo');
-const stepLyrics = document.getElementById('stepLyrics');
-const stepPlayer = document.getElementById('stepPlayer');
-
-// Toolbars
-const videoToolbar = document.getElementById('videoToolbar');
-const lyricsToolbar = document.getElementById('lyricsToolbar');
-const playerToolbar = document.getElementById('playerToolbar');
+// Navigation links
+const navVideo = document.getElementById('navVideo');
+const navLyrics = document.getElementById('navLyrics');
+const navPlayer = document.getElementById('navPlayer');
 
 // Initialize YouTube API
 function onYouTubeIframeAPIReady() {
@@ -150,45 +145,65 @@ function updateCurrentLyric() {
 function goToStep(step) {
   currentStep = step;
   
-  // Update step indicators
-  stepVideo.classList.remove('active');
-  stepLyrics.classList.remove('active');
-  stepPlayer.classList.remove('active');
-  
-  // Hide all toolbars
-  videoToolbar.classList.add('hidden');
-  lyricsToolbar.classList.add('hidden');
-  playerToolbar.classList.add('hidden');
+  // Update navigation links
+  navVideo.classList.remove('active');
+  navLyrics.classList.remove('active', 'disabled');
+  navPlayer.classList.remove('active', 'disabled');
   
   // Update UI based on step
   switch(step) {
     case 'video':
-      stepVideo.classList.add('active');
-      videoToolbar.classList.remove('hidden');
-      videoToolbar.classList.add('slide-in');
+      // Update nav
+      navVideo.classList.add('active');
+      navLyrics.classList.add('disabled');
+      navPlayer.classList.add('disabled');
+      
+      // Show video input, hide other sections
+      videoInput.classList.remove('hidden');
+      lyricsSearch.classList.add('hidden');
+      lyricsView.classList.add('hidden');
+      tabBar.classList.add('hidden');
+      
+      // Hide player controls
       currentTimeDisplay.classList.add('hidden');
       playbackControls.classList.add('hidden');
       break;
       
     case 'lyrics':
-      stepVideo.classList.add('active');
-      stepLyrics.classList.add('active');
-      lyricsToolbar.classList.remove('hidden');
-      lyricsToolbar.classList.add('slide-in');
-      lyricsPanel.classList.remove('hidden');
-      searchResults.classList.remove('hidden');
+      // Update nav
+      navVideo.classList.add('active');
+      navLyrics.classList.add('active');
+      navPlayer.classList.add('disabled');
+      
+      // Hide video input, show lyrics search
+      videoInput.classList.add('hidden');
+      lyricsSearch.classList.remove('hidden');
       lyricsView.classList.add('hidden');
+      tabBar.classList.add('hidden');
+      
+      // Hide player controls
       currentTimeDisplay.classList.add('hidden');
       playbackControls.classList.add('hidden');
+      
+      // Prefill and auto-search if we have a title
+      if (artistSongInput.value.trim()) {
+        debouncedSearchLyrics(artistSongInput.value.trim());
+      }
       break;
       
     case 'player':
-      stepVideo.classList.add('active');
-      stepLyrics.classList.add('active');
-      stepPlayer.classList.add('active');
-      playerToolbar.classList.remove('hidden');
-      playerToolbar.classList.add('slide-in');
-      lyricsPanel.classList.remove('hidden');
+      // Update nav
+      navVideo.classList.add('active');
+      navLyrics.classList.add('active');
+      navPlayer.classList.add('active');
+      
+      // Hide input sections, show lyrics view
+      videoInput.classList.add('hidden');
+      lyricsSearch.classList.add('hidden');
+      lyricsView.classList.remove('hidden');
+      tabBar.classList.remove('hidden');
+      
+      // Show player controls
       currentTimeDisplay.classList.remove('hidden');
       playbackControls.classList.remove('hidden');
       break;
@@ -271,15 +286,14 @@ function displayLyricsWithPinyin(lyrics) {
     lyricsView.appendChild(lineElement);
   });
   
-  // Show lyrics view and controls
-  searchTab.classList.remove('text-blue-500', 'border-blue-500');
+  // Update tab appearance
+  searchTab.classList.remove('bg-blue-50', 'text-blue-500');
   searchTab.classList.add('text-gray-500');
   lyricsTab.classList.remove('text-gray-500');
-  lyricsTab.classList.add('text-blue-500', 'border-blue-500');
+  lyricsTab.classList.add('bg-blue-50', 'text-blue-500');
   
-  searchResults.classList.add('hidden');
-  lyricsView.classList.remove('hidden');
-  playbackControls.classList.remove('hidden');
+  // Go to player mode
+  goToStep('player');
 }
 
 // Display search results
@@ -291,6 +305,13 @@ function displaySearchResults(results) {
     return;
   }
   
+  // Add results header
+  const headerElement = document.createElement('div');
+  headerElement.className = 'text-xs text-gray-500 px-2 py-1 bg-gray-50';
+  headerElement.textContent = `${results.length} results found`;
+  searchResults.appendChild(headerElement);
+  
+  // Add each result
   results.forEach(result => {
     const resultElement = document.createElement('div');
     resultElement.className = 'search-result cursor-pointer fade-in';
@@ -306,17 +327,9 @@ function displaySearchResults(results) {
     resultElement.addEventListener('click', async () => {
       // Show loading indicator
       lyricsView.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div></div>';
-      lyricsView.classList.remove('hidden');
-      searchResults.classList.add('hidden');
       
-      // Move to player step
-      goToStep('player');
-      
-      // Update tabs appearance
-      searchTab.classList.remove('bg-blue-50', 'text-blue-500');
-      searchTab.classList.add('text-gray-500');
-      lyricsTab.classList.remove('text-gray-500');
-      lyricsTab.classList.add('bg-blue-50', 'text-blue-500');
+      // Enable player nav
+      navPlayer.classList.remove('disabled');
       
       try {
         const fullLyrics = await getLyrics(result.id);
@@ -324,6 +337,7 @@ function displaySearchResults(results) {
         displayLyricsWithPinyin(parsedLyrics);
       } catch (error) {
         lyricsView.innerHTML = '<p class="text-red-500 text-center p-4 text-sm">Error loading lyrics. Please try again.</p>';
+        goToStep('lyrics');
       }
     });
     
@@ -331,7 +345,7 @@ function displaySearchResults(results) {
   });
 }
 
-// Event Listeners for toolbar navigation
+// Event Listeners
 loadVideoButton.addEventListener('click', async () => {
   // Clear any previous errors
   document.getElementById('errorContainer').innerHTML = '';
@@ -348,6 +362,9 @@ loadVideoButton.addEventListener('click', async () => {
     return;
   }
   
+  // Show loading indicator
+  videoInput.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div><div class="ml-3">Loading video...</div></div>';
+  
   try {
     // Load video metadata
     const metadata = await loadVideoMetadata(youtubeUrl);
@@ -357,9 +374,28 @@ loadVideoButton.addEventListener('click', async () => {
     
     // Populate artist/song field and move to lyrics step
     artistSongInput.value = metadata.title || '';
+    
+    // Enable the lyrics nav button
+    navLyrics.classList.remove('disabled');
+    
+    // Move to lyrics step
     goToStep('lyrics');
   } catch (error) {
     showError('Error loading video: ' + error.message, 'errorContainer');
+    // Restore video input
+    videoInput.innerHTML = `
+      <h1 class="text-xl font-bold text-gray-700 mb-4">YouTube Pinyin Karaoke</h1>
+      <div class="flex flex-col gap-2">
+        <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border rounded" 
+          placeholder="Enter YouTube URL..." value="${youtubeUrl}">
+        <button id="loadVideo" class="bg-blue-500 text-white py-2 px-3 rounded text-sm">
+          Load Video
+        </button>
+      </div>
+    `;
+    // Need to reattach the event listeners
+    document.getElementById('loadVideo').addEventListener('click', loadVideoButton.onclick);
+    document.getElementById('youtubeUrl').addEventListener('keypress', youtubeUrlInput.onkeypress);
   }
 });
 
@@ -388,36 +424,53 @@ searchLyricsButton.addEventListener('click', () => {
 });
 
 // Navigation between steps
-backToVideoButton.addEventListener('click', () => {
-  goToStep('video');
+navVideo.addEventListener('click', () => {
+  if (!navVideo.classList.contains('disabled')) {
+    goToStep('video');
+  }
 });
 
-backToLyricsButton.addEventListener('click', () => {
-  goToStep('lyrics');
+navLyrics.addEventListener('click', () => {
+  if (!navLyrics.classList.contains('disabled')) {
+    goToStep('lyrics');
+  }
+});
+
+navPlayer.addEventListener('click', () => {
+  if (!navPlayer.classList.contains('disabled') && currentLyrics.length > 0) {
+    goToStep('player');
+  }
 });
 
 // Tab switching in player mode
 searchTab.addEventListener('click', () => {
-  if (searchResults.classList.contains('hidden') && currentStep === 'player') {
+  if (currentStep === 'player') {
+    // Update style
     searchTab.classList.add('bg-blue-50', 'text-blue-500');
     searchTab.classList.remove('text-gray-500');
     lyricsTab.classList.add('text-gray-500');
     lyricsTab.classList.remove('bg-blue-50', 'text-blue-500');
     
-    searchResults.classList.remove('hidden');
-    lyricsView.classList.add('hidden');
+    // Go back to search
+    goToStep('lyrics');
   }
 });
 
 lyricsTab.addEventListener('click', () => {
-  if (lyricsView.classList.contains('hidden') && currentLyrics.length > 0 && currentStep === 'player') {
+  if (currentStep === 'player' && lyricsSearch.classList.contains('hidden')) {
+    // No need to do anything, already in lyrics view
+    return;
+  }
+  
+  if (currentLyrics.length > 0) {
+    // Update style
     lyricsTab.classList.add('bg-blue-50', 'text-blue-500');
     lyricsTab.classList.remove('text-gray-500');
     searchTab.classList.add('text-gray-500');
     searchTab.classList.remove('bg-blue-50', 'text-blue-500');
     
-    lyricsView.classList.remove('hidden');
-    searchResults.classList.add('hidden');
+    // Go to player
+    goToStep('player');
   }
 });
 
