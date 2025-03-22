@@ -126,10 +126,11 @@ function updateCurrentLyric() {
   
   // Highlight current lyric line
   if (currentIndex >= 0) {
-    const lyricElements = lyricsView.querySelectorAll('.lyric-line');
+    const lyricElements = lyricsView.querySelectorAll('div[data-time]');
     lyricElements.forEach((el, index) => {
       if (index === currentIndex) {
-        el.classList.add('active');
+        el.classList.add('active', 'bg-yellow-100/70', 'border-amber-400');
+        el.querySelector('div:last-child').classList.add('font-bold');
         
         // Use scrollIntoView for simpler, more reliable scrolling
         el.scrollIntoView({
@@ -137,7 +138,9 @@ function updateCurrentLyric() {
           block: 'center' // Center the element vertically
         });
       } else {
-        el.classList.remove('active');
+        el.classList.remove('active', 'bg-yellow-100/70', 'border-amber-400');
+        el.querySelector('div:last-child').classList.remove('font-bold');
+        el.classList.remove('bg-gray-100/70', 'translate-x-0.5');
       }
     });
     
@@ -152,18 +155,18 @@ function updateCurrentLyric() {
 function goToStep(step) {
   currentStep = step;
   
-  // Update navigation links
-  navVideo.classList.remove('active');
-  navLyrics.classList.remove('active', 'disabled');
-  navPlayer.classList.remove('active', 'disabled');
+  // Update navigation links - remove all active/disabled states
+  navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60';
+  navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60';
+  navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60';
   
   // Update UI based on step
   switch(step) {
     case 'video':
       // Update nav
-      navVideo.classList.add('active');
-      navLyrics.classList.add('disabled');
-      navPlayer.classList.add('disabled');
+      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
+      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
+      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
       
       // Show video input, hide other sections
       videoInput.classList.remove('hidden');
@@ -176,9 +179,9 @@ function goToStep(step) {
       
     case 'lyrics':
       // Update nav
-      navVideo.classList.add('active');
-      navLyrics.classList.add('active');
-      navPlayer.classList.add('disabled');
+      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
+      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
+      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
       
       // Hide video input, show lyrics search
       videoInput.classList.add('hidden');
@@ -196,9 +199,9 @@ function goToStep(step) {
       
     case 'player':
       // Update nav
-      navVideo.classList.add('active');
-      navLyrics.classList.add('active');
-      navPlayer.classList.add('active');
+      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
+      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
+      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
       
       // Hide input sections, show lyrics view
       videoInput.classList.add('hidden');
@@ -272,19 +275,30 @@ function displayLyricsWithPinyin(lyrics) {
   
   lyrics.forEach((line, index) => {
     const lineElement = document.createElement('div');
-    lineElement.className = 'lyric-line fade-in';
+    lineElement.className = 'px-2 py-1 mb-2 rounded cursor-pointer transition-all duration-200 border-l-4 border-transparent animate-fade-in relative';
     
     const pinyinElement = document.createElement('div');
-    pinyinElement.className = 'pinyin-text';
+    pinyinElement.className = 'text-base text-gray-500 leading-snug';
     pinyinElement.textContent = convertToPinyin(line.text);
     
     const chineseElement = document.createElement('div');
-    chineseElement.className = 'chinese-text';
+    chineseElement.className = 'text-lg font-medium leading-relaxed';
     chineseElement.textContent = line.text;
     
     lineElement.appendChild(pinyinElement);
     lineElement.appendChild(chineseElement);
     lyricsView.appendChild(lineElement);
+    
+    // Add hover effect with JS since we can't use CSS
+    lineElement.addEventListener('mouseenter', () => {
+      lineElement.classList.add('bg-gray-100/70', 'translate-x-0.5');
+    });
+    
+    lineElement.addEventListener('mouseleave', () => {
+      if (!lineElement.classList.contains('active')) {
+        lineElement.classList.remove('bg-gray-100/70', 'translate-x-0.5');
+      }
+    });
     
     // Add click event to jump to this timestamp in the video
     lineElement.addEventListener('click', () => {
@@ -321,7 +335,7 @@ function displaySearchResults(results) {
   // Add each result
   results.forEach(result => {
     const resultElement = document.createElement('div');
-    resultElement.className = 'search-result cursor-pointer fade-in';
+    resultElement.className = 'p-2 border-b border-gray-200 cursor-pointer animate-fade-in hover:bg-gray-50 transition-colors duration-100';
     
     const artistName = result.artistName || 'Unknown Artist';
     const trackName = result.trackName || 'Unknown Song';

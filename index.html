@@ -6,8 +6,23 @@
   <title>YouTube Pinyin Karaoke Generator</title>
   <!-- Tailwind CSS from CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Custom styles -->
-  <link rel="stylesheet" href="styles.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          animation: {
+            'fade-in': 'fadeIn 0.3s ease-in',
+          },
+          keyframes: {
+            fadeIn: {
+              '0%': { opacity: '0' },
+              '100%': { opacity: '1' },
+            }
+          }
+        }
+      }
+    }
+  </script>
 </head>
 <body class="min-h-screen bg-gray-100 flex justify-center">
 <div id="app-container" class="h-screen w-full max-w-[600px] lg:max-w-[90%] xl:max-w-[1500px] flex flex-col overflow-hidden bg-white shadow-lg border-x border-gray-200">
@@ -16,11 +31,11 @@
     <div class="flex items-center h-12 px-3">
       <!-- Steps as nav links -->
       <div class="steps flex items-center text-xs">
-        <button id="navVideo" class="nav-link active">Video</button>
+        <button id="navVideo" class="px-2 py-1 opacity-100 transition-all duration-200 rounded font-semibold text-blue-500">Video</button>
         <span class="mx-1 text-gray-300">›</span>
-        <button id="navLyrics" class="nav-link disabled">Lyrics</button>
+        <button id="navLyrics" class="px-2 py-1 opacity-40 transition-all duration-200 rounded font-medium text-gray-400 cursor-default">Lyrics</button>
         <span class="mx-1 text-gray-300">›</span>
-        <button id="navPlayer" class="nav-link disabled">Player</button>
+        <button id="navPlayer" class="px-2 py-1 opacity-40 transition-all duration-200 rounded font-medium text-gray-400 cursor-default">Player</button>
       </div>
       
       <!-- Current time display -->
@@ -41,7 +56,7 @@
         <div id="videoInput" class="text-center p-4 w-full max-w-md">
           <h1 class="text-xl font-bold text-gray-700 mb-4">YouTube Pinyin Karaoke</h1>
           <div class="flex flex-col gap-2">
-            <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border rounded" 
+            <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border rounded focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100" 
               placeholder="Enter YouTube URL...">
             <button id="loadVideo" class="bg-blue-500 text-white py-2 px-3 rounded text-sm">
               Load Video
@@ -58,7 +73,7 @@
         <!-- Search input directly in lyrics container - fixed height -->
         <div class="p-3 border-b flex-none">
           <div class="flex gap-2">
-            <input type="text" id="artistSong" class="flex-grow p-2 text-sm border rounded" 
+            <input type="text" id="artistSong" class="flex-grow p-2 text-sm border rounded focus:outline-none focus:border-blue-300 focus:ring-2 focus:ring-blue-100" 
               placeholder="Enter artist or song name">
             <button id="searchLyrics" class="bg-green-500 text-white py-2 px-3 rounded text-sm whitespace-nowrap">
               Search
@@ -76,7 +91,7 @@
       </div>
       
       <!-- Lyrics display container - fills all available space -->
-      <div id="lyricsView" class="bg-white border-t hidden overflow-y-auto p-3 h-full">
+      <div id="lyricsView" class="bg-white border-t hidden overflow-y-auto p-3 h-full scroll-smooth">
         <!-- Lyrics with pinyin will be displayed here -->
       </div>
     </div>
