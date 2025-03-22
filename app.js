@@ -73,6 +73,9 @@ function createYouTubePlayer(videoId) {
       'onStateChange': onPlayerStateChange
     }
   });
+  
+  // Update nav state since video is now loaded
+  updateNavState();
 }
 
 // Player ready event handler
@@ -151,22 +154,41 @@ function updateCurrentLyric() {
   }
 }
 
+// Update the navigation state based on current app state
+function updateNavState() {
+  const videoLoaded = player !== undefined && player !== null;
+  const lyricsLoaded = currentLyrics.length > 0;
+  
+  // Always allow video navigation
+  navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60 cursor-pointer';
+  
+  // Lyrics navigation requires video to be loaded
+  if (videoLoaded) {
+    navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60 cursor-pointer';
+  } else {
+    navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
+  }
+  
+  // Player navigation requires both video and lyrics
+  if (videoLoaded && lyricsLoaded) {
+    navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60 cursor-pointer';
+  } else {
+    navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
+  }
+}
+
 // Navigation functions
 function goToStep(step) {
   currentStep = step;
   
-  // Update navigation links - remove all active/disabled states
-  navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60';
-  navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60';
-  navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-500 opacity-60';
+  // Update navigation links - set correct base states
+  updateNavState();
   
   // Update UI based on step
   switch(step) {
     case 'video':
-      // Update nav
-      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
-      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
-      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
+      // Update active nav item
+      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
       
       // Show video input, hide other sections
       videoInput.classList.remove('hidden');
@@ -178,10 +200,9 @@ function goToStep(step) {
       break;
       
     case 'lyrics':
-      // Update nav
-      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
-      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
-      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-medium text-gray-400 opacity-40 cursor-default';
+      // Update active nav items
+      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
+      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
       
       // Hide video input, show lyrics search
       videoInput.classList.add('hidden');
@@ -198,10 +219,10 @@ function goToStep(step) {
       break;
       
     case 'player':
-      // Update nav
-      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
-      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
-      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100';
+      // Update active nav items
+      navVideo.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
+      navLyrics.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
+      navPlayer.className = 'px-2 py-1 transition-all duration-200 rounded font-semibold text-blue-500 opacity-100 cursor-pointer';
       
       // Hide input sections, show lyrics view
       videoInput.classList.add('hidden');
@@ -313,6 +334,9 @@ function displayLyricsWithPinyin(lyrics) {
     lineElement.setAttribute('data-time', line.startTime);
   });
   
+  // Update nav state since lyrics are now loaded
+  updateNavState();
+  
   // Go to player mode
   goToStep('player');
 }
@@ -390,14 +414,17 @@ loadVideoButton.addEventListener('click', async () => {
     // Load video metadata
     const metadata = await loadVideoMetadata(youtubeUrl);
     
+    // If user loaded a new video, clear any existing lyrics
+    if (currentLyrics.length > 0) {
+      currentLyrics = [];
+      lyricsView.innerHTML = '';
+    }
+    
     // Create YouTube player
     createYouTubePlayer(videoId);
     
     // Populate artist/song field and move to lyrics step
     artistSongInput.value = metadata.title || '';
-    
-    // Enable the lyrics nav button
-    navLyrics.classList.remove('disabled');
     
     // Move to lyrics step
     goToStep('lyrics');
@@ -447,18 +474,32 @@ searchLyricsButton.addEventListener('click', () => {
 // Navigation between steps
 navVideo.addEventListener('click', () => {
   if (!navVideo.classList.contains('disabled')) {
+    // If we're on the player step and going back to video, clear everything
+    if (currentStep === 'player') {
+      currentLyrics = [];
+      lyricsView.innerHTML = '';
+    }
+    
     goToStep('video');
   }
 });
 
 navLyrics.addEventListener('click', () => {
-  if (!navLyrics.classList.contains('disabled')) {
+  // Only allow clicking lyrics if video is loaded
+  if (!navLyrics.classList.contains('disabled') && player) {
+    // If we're on the player step going to lyrics, clear the selected lyrics
+    if (currentStep === 'player') {
+      currentLyrics = [];
+      lyricsView.innerHTML = '';
+    }
+    
     goToStep('lyrics');
   }
 });
 
 navPlayer.addEventListener('click', () => {
-  if (!navPlayer.classList.contains('disabled') && currentLyrics.length > 0) {
+  // Only allow clicking player if video is loaded and lyrics are selected
+  if (!navPlayer.classList.contains('disabled') && player && currentLyrics.length > 0) {
     goToStep('player');
   }
 });
@@ -484,5 +525,12 @@ artistSongInput.addEventListener('keypress', (e) => {
 
 // Initialize the UI
 document.addEventListener('DOMContentLoaded', () => {
+  // Reset application state
+  player = undefined;
+  currentLyrics = [];
+  timeOffset = 0;
+  
+  // Set initial UI state
+  updateNavState();
   goToStep('video');
 });
