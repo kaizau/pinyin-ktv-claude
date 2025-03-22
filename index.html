@@ -49,9 +49,9 @@
   <!-- Main content area - fills remaining space -->
   <div class="flex flex-col lg:flex-row flex-grow overflow-hidden">
     <!-- Video section -->
-    <div id="videoSection" class="flex-none lg:flex-1 bg-white w-full max-h-[40vh] lg:max-h-none lg:h-auto">
-      <!-- Video placeholder/player with responsive sizing -->
-      <div id="playerContainer" class="w-full aspect-video bg-gray-100 flex items-center justify-center max-h-full relative">
+    <div id="videoSection" class="flex-none lg:flex-1 bg-white w-full max-h-[40vh] lg:max-h-none lg:h-full flex flex-col">
+      <!-- Video placeholder/player with responsive sizing on mobile, full height on desktop -->
+      <div id="playerContainer" class="w-full aspect-video lg:aspect-auto bg-gray-100 flex items-center justify-center max-h-full lg:h-full relative flex-grow">
         <!-- Player will be created here -->
         <div id="player" class="w-full h-full absolute top-0 left-0"></div>
         <!-- Initial state with input -->

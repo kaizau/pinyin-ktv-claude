@@ -69,6 +69,10 @@ function createYouTubePlayer(videoId) {
   
   // Hide the video input form
   videoInput.classList.add('hidden');
+  
+  // Ensure the player container has the correct aspect ratio for desktop
+  // This ensures the player takes up the full height on desktop
+  playerContainer.classList.add('lg:flex-grow');
 
   // Create a new YouTube player
   player = new YT.Player('player', {
