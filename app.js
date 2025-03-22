@@ -303,7 +303,7 @@ function displayLyricsWithPinyin(lyrics) {
     pinyinElement.textContent = convertToPinyin(line.text);
     
     const chineseElement = document.createElement('div');
-    chineseElement.className = 'text-lg font-medium leading-relaxed';
+    chineseElement.className = 'text-lg font-medium leading-relaxed tracking-widest';
     chineseElement.textContent = line.text;
     
     lineElement.appendChild(pinyinElement);
