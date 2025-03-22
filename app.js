@@ -646,6 +646,16 @@ function initializeTheme() {
   });
 }
 
+// Handle example song link
+document.addEventListener('click', (e) => {
+  if (e.target.closest('#exampleSong')) {
+    e.preventDefault();
+    const exampleUrl = 'https://www.youtube.com/watch?v=Hlp8XD0R5qo';
+    youtubeUrlInput.value = exampleUrl;
+    loadVideoButton.click();
+  }
+});
+
 // Initialize the UI
 document.addEventListener('DOMContentLoaded', () => {
   // Reset application state

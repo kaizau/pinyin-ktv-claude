@@ -57,13 +57,24 @@
         <div id="player" class="w-full h-full absolute top-0 left-0"></div>
         <!-- Initial state with input -->
         <div id="videoInput" class="text-center p-4 w-full max-w-md z-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900 transition-colors duration-300">
-          <h1 class="text-xl font-bold text-gray-700 dark:text-gray-200 mb-4 transition-colors duration-300">YouTube Pinyin Karaoke</h1>
+          <h1 class="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2 transition-colors duration-300">Pinyin KTV</h1>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">Laowai-friendly pinyin lyrics for popular Chinese songs on YouTube</p>
           <div class="flex flex-col gap-2">
             <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border dark:border-gray-600 rounded focus:outline-none focus:border-blue-300 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300" 
               placeholder="Enter YouTube URL...">
             <button id="loadVideo" class="bg-blue-500 dark:bg-blue-600 text-white py-2 px-3 rounded text-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-300">
               Load Video
             </button>
+          </div>
+          <div class="mt-4 text-left">
+            <p class="text-xs text-gray-500 dark:text-gray-500 mb-1 transition-colors duration-300">Try this popular song:</p>
+            <a href="#" id="exampleSong" class="text-sm text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-300 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              孤勇者 Lonely Warrior - 陳奕迅 Eason Chan
+            </a>
           </div>
         </div>
       </div>
