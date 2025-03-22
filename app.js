@@ -112,13 +112,25 @@ function updateCurrentLyric() {
     const lyricElements = lyricsView.querySelectorAll('.lyric-line');
     lyricElements.forEach((el, index) => {
       if (index === currentIndex) {
-        el.classList.add('bg-yellow-100');
-        // Auto-scroll to keep current line visible
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('active');
+        
+        // Auto-scroll to keep current line visible with some context above
+        const containerHeight = lyricsView.clientHeight;
+        const scrollPosition = el.offsetTop - (containerHeight / 3);
+        lyricsView.scrollTo({
+          top: scrollPosition,
+          behavior: 'smooth'
+        });
       } else {
-        el.classList.remove('bg-yellow-100');
+        el.classList.remove('active');
       }
     });
+    
+    // Update time display if we have one
+    if (document.getElementById('currentTime')) {
+      const formattedTime = formatTime(currentTime);
+      document.getElementById('currentTime').textContent = formattedTime;
+    }
   }
 }
 
@@ -183,14 +195,14 @@ function displayLyricsWithPinyin(lyrics) {
   
   lyrics.forEach(line => {
     const lineElement = document.createElement('div');
-    lineElement.className = 'lyric-line mb-4';
+    lineElement.className = 'lyric-line fade-in';
     
     const pinyinElement = document.createElement('div');
-    pinyinElement.className = 'text-xs text-gray-500';
+    pinyinElement.className = 'pinyin-text';
     pinyinElement.textContent = convertToPinyin(line.text);
     
     const chineseElement = document.createElement('div');
-    chineseElement.className = 'text-lg';
+    chineseElement.className = 'chinese-text';
     chineseElement.textContent = line.text;
     
     lineElement.appendChild(pinyinElement);
@@ -214,35 +226,49 @@ function displaySearchResults(results) {
   searchResults.innerHTML = '';
   
   if (results.length === 0) {
-    searchResults.innerHTML = '<p class="text-gray-500">No lyrics found. Try a different search term.</p>';
+    searchResults.innerHTML = '<p class="text-gray-500 p-4 text-center text-sm">No lyrics found. Try a different search term.</p>';
     return;
   }
   
   results.forEach(result => {
     const resultElement = document.createElement('div');
-    resultElement.className = 'p-2 hover:bg-gray-100 cursor-pointer border-b';
+    resultElement.className = 'search-result cursor-pointer fade-in';
+    
+    const artistName = result.artistName || 'Unknown Artist';
+    const trackName = result.trackName || 'Unknown Song';
+    
     resultElement.innerHTML = `
-      <div class="font-medium">${result.artistName || 'Unknown Artist'}</div>
-      <div>${result.trackName || 'Unknown Song'}</div>
+      <div class="font-medium text-sm">${artistName}</div>
+      <div class="text-sm text-gray-700">${trackName}</div>
     `;
     
     resultElement.addEventListener('click', async () => {
+      // Show loading indicator
+      lyricsView.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div></div>';
+      lyricsView.classList.remove('hidden');
+      searchResults.classList.add('hidden');
+      
+      // Update tabs
+      searchTab.classList.remove('text-blue-500', 'border-blue-500');
+      searchTab.classList.add('text-gray-500');
+      lyricsTab.classList.remove('text-gray-500');
+      lyricsTab.classList.add('text-blue-500', 'border-blue-500');
+      
       try {
         const fullLyrics = await getLyrics(result.id);
         const parsedLyrics = parseLyrics(fullLyrics.syncedLyrics);
         displayLyricsWithPinyin(parsedLyrics);
       } catch (error) {
-        lyricsView.innerHTML = '<p class="text-red-500">Error loading lyrics. Please try again.</p>';
-        lyricsView.classList.remove('hidden');
-        searchResults.classList.add('hidden');
+        lyricsView.innerHTML = '<p class="text-red-500 text-center p-4 text-sm">Error loading lyrics. Please try again.</p>';
       }
     });
     
     searchResults.appendChild(resultElement);
   });
   
-  // Show search results panel
+  // Show search results panel with fade in effect
   lyricsPanel.classList.remove('hidden');
+  lyricsPanel.classList.add('fade-in');
 }
 
 // Event Listeners

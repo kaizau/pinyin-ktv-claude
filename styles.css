@@ -1,13 +1,28 @@
 /* Custom styles for YouTube Pinyin Karaoke Generator */
 
+/* Lyric line highlighting */
 .lyric-line {
-  transition: background-color 0.3s ease;
-  padding: 8px;
+  transition: background-color 0.2s ease;
+  padding: 4px 8px;
   border-radius: 4px;
+  margin-bottom: 8px;
 }
 
 .lyric-line.active {
   background-color: rgba(254, 240, 138, 0.7); /* yellow-100 with opacity */
+}
+
+/* Pinyin styling */
+.pinyin-text {
+  font-size: 0.75rem;
+  color: #6b7280; /* gray-500 */
+  line-height: 1.2;
+}
+
+.chinese-text {
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.5;
 }
 
 /* Smooth scrolling for lyric panel */
@@ -15,22 +30,64 @@
   scroll-behavior: smooth;
 }
 
-/* Responsive styles */
-@media (max-width: 768px) {
-  .container {
-    padding: 8px;
+/* Make search results easy to select */
+.search-result {
+  padding: 8px;
+  border-bottom: 1px solid #e5e7eb;
+  transition: background-color 0.1s ease;
+}
+
+.search-result:hover {
+  background-color: #f9fafb;
+}
+
+/* Keep video section always visible */
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background-color: white;
+}
+
+/* Fade in animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+/* Compact height when keyboard is open on mobile */
+@media (max-height: 600px) {
+  #lyricsView, #searchResults {
+    max-height: 200px !important;
   }
-  
-  #player {
-    min-height: 200px;
+}
+
+/* Adjust for larger screens */
+@media (min-width: 768px) {
+  #lyricsView, #searchResults {
+    max-height: calc(100vh - 400px) !important;
   }
-  
-  /* Keep video visible when scrolling on mobile */
-  .sticky-top {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    background-color: white;
-    padding-bottom: 8px;
-  }
+}
+
+/* Better contrast for current line */
+.lyric-line.active .chinese-text {
+  font-weight: bold;
+}
+
+/* Hide scrollbars on some browsers but keep functionality */
+#lyricsView, #searchResults {
+  scrollbar-width: thin;
+}
+
+#lyricsView::-webkit-scrollbar, #searchResults::-webkit-scrollbar {
+  width: 6px;
+}
+
+#lyricsView::-webkit-scrollbar-thumb, #searchResults::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
 }
