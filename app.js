@@ -29,11 +29,7 @@ function refreshElementReferences() {
   loadVideoButton = document.getElementById('loadVideo');
   artistSongInput = document.getElementById('artistSong'); 
   searchLyricsButton = document.getElementById('searchLyrics');
-  themeToggleButton = document.getElementById('themeToggle');
 }
-
-// Get theme toggle button reference
-let themeToggleButton = document.getElementById('themeToggle');
 
 // Initialize YouTube API
 function onYouTubeIframeAPIReady() {
@@ -603,7 +599,7 @@ artistSongInput.addEventListener('keypress', (e) => {
   }
 });
 
-// Handle dark/light mode
+// Handle dark/light mode based on system preference only
 function initializeTheme() {
   // Check for system preference
   if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -618,13 +614,6 @@ function initializeTheme() {
       document.documentElement.classList.remove('dark');
     }
   });
-  
-  // Add click handler for theme toggle button
-  if (themeToggleButton) {
-    themeToggleButton.addEventListener('click', () => {
-      document.documentElement.classList.toggle('dark');
-    });
-  }
 }
 
 // Initialize the UI
