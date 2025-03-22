@@ -1,127 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Pinyin Karaoke Generator</title>
-  <!-- Tailwind CSS from CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          animation: {
-            'fade-in': 'fadeIn 0.3s ease-in',
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pinyin KTV</title>
+    <meta
+      name="description"
+      content="Laowai-friendly lyrics for popular Chinese songs"
+    />
+    <!-- Tailwind CSS from CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            animation: {
+              "fade-in": "fadeIn 0.3s ease-in",
+            },
+            keyframes: {
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+            },
           },
-          keyframes: {
-            fadeIn: {
-              '0%': { opacity: '0' },
-              '100%': { opacity: '1' },
-            }
-          }
-        }
-      }
-    }
-  </script>
-</head>
-<body class="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center transition-colors duration-300">
-<div id="app-container" class="h-screen w-full max-w-[600px] lg:max-w-[90%] xl:max-w-[1500px] flex flex-col overflow-hidden bg-white dark:bg-gray-800 shadow-lg border-x border-gray-200 dark:border-gray-700 transition-colors duration-300">
-  <!-- Navigation bar - fixed height -->
-  <nav class="flex-none bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 z-20 transition-colors duration-300">
-    <div class="flex items-center h-12 px-3">
-      <!-- Steps as nav links -->
-      <div class="steps flex items-center text-xs">
-        <button id="navVideo" class="px-2 py-1 opacity-100 transition-all duration-200 rounded font-semibold text-blue-500 dark:text-blue-400 cursor-pointer">Video</button>
-        <span class="mx-1 text-gray-300 dark:text-gray-600">›</span>
-        <button id="navLyrics" class="px-2 py-1 opacity-40 transition-all duration-200 rounded font-medium text-gray-400 dark:text-gray-500 cursor-default">Lyrics</button>
-        <span class="mx-1 text-gray-300 dark:text-gray-600">›</span>
-        <button id="navPlayer" class="px-2 py-1 opacity-40 transition-all duration-200 rounded font-medium text-gray-400 dark:text-gray-500 cursor-default">Player</button>
-      </div>
-      
-      <!-- Current time display -->
-      <span id="currentTime" class="text-xs text-gray-500 dark:text-gray-400 ml-auto hidden">0:00</span>
-    </div>
-  </nav>
-  
-  <!-- Error messages container -->
-  <div id="errorContainer" class="w-full flex-none"></div>
-  
-  <!-- Main content area - fills remaining space -->
-  <div class="flex flex-col lg:flex-row flex-grow overflow-hidden">
-    <!-- Video section -->
-    <div id="videoSection" class="flex-none lg:flex-1 bg-white dark:bg-gray-800 w-full max-h-[40vh] lg:max-h-none lg:h-full flex flex-col transition-colors duration-300">
-      <!-- Video placeholder/player with responsive sizing on mobile, full height on desktop -->
-      <div id="playerContainer" class="w-full aspect-video lg:aspect-auto bg-gray-100 dark:bg-gray-900 flex items-center justify-center max-h-full lg:h-full relative flex-grow transition-colors duration-300">
-        <!-- Player will be created here -->
-        <div id="player" class="w-full h-full absolute top-0 left-0"></div>
-        <!-- Initial state with input -->
-        <div id="videoInput" class="text-center p-4 w-full max-w-md z-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900 transition-colors duration-300">
-          <h1 class="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2 transition-colors duration-300">Pinyin KTV</h1>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300">Laowai-friendly pinyin lyrics for popular Chinese songs on YouTube</p>
-          <div class="flex flex-col gap-2">
-            <input type="text" id="youtubeUrl" class="w-full p-2 text-sm border dark:border-gray-600 rounded focus:outline-none focus:border-blue-300 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300" 
-              placeholder="Enter YouTube URL...">
-            <button id="loadVideo" class="bg-blue-500 dark:bg-blue-600 text-white py-2 px-3 rounded text-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-300">
-              Load Video
+        },
+      };
+    </script>
+  </head>
+  <body
+    class="min-h-screen bg-gray-100 dark:bg-gray-900 flex justify-center transition-colors duration-300"
+  >
+    <div
+      id="app-container"
+      class="h-screen w-full max-w-[600px] lg:max-w-[90%] xl:max-w-[1500px] flex flex-col overflow-hidden bg-white dark:bg-gray-800 shadow-lg border-x border-gray-200 dark:border-gray-700 transition-colors duration-300"
+    >
+      <!-- Navigation bar - fixed height -->
+      <nav
+        class="flex-none bg-white dark:bg-gray-800 shadow-sm border-b dark:border-gray-700 z-20 transition-colors duration-300"
+      >
+        <div class="flex items-center h-12 px-3">
+          <!-- Steps as nav links -->
+          <div class="steps flex items-center text-xs">
+            <button
+              id="navVideo"
+              class="px-2 py-1 opacity-100 transition-all duration-200 rounded font-semibold text-blue-500 dark:text-blue-400 cursor-pointer"
+            >
+              Video
+            </button>
+            <span class="mx-1 text-gray-300 dark:text-gray-600">›</span>
+            <button
+              id="navLyrics"
+              class="px-2 py-1 opacity-40 transition-all duration-200 rounded font-medium text-gray-400 dark:text-gray-500 cursor-default"
+            >
+              Lyrics
+            </button>
+            <span class="mx-1 text-gray-300 dark:text-gray-600">›</span>
+            <button
+              id="navPlayer"
+              class="px-2 py-1 opacity-40 transition-all duration-200 rounded font-medium text-gray-400 dark:text-gray-500 cursor-default"
+            >
+              Player
             </button>
           </div>
-          <div class="mt-4 text-left">
-            <p class="text-xs text-gray-500 dark:text-gray-500 mb-1 transition-colors duration-300">Try this popular song:</p>
-            <a href="#" id="exampleSong" class="text-sm text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-300 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              孤勇者 Lonely Warrior - 陳奕迅 Eason Chan
-            </a>
+
+          <!-- Current time display -->
+          <span
+            id="currentTime"
+            class="text-xs text-gray-500 dark:text-gray-400 ml-auto hidden"
+            >0:00</span
+          >
+        </div>
+      </nav>
+
+      <!-- Error messages container -->
+      <div id="errorContainer" class="w-full flex-none"></div>
+
+      <!-- Main content area - fills remaining space -->
+      <div class="flex flex-col lg:flex-row flex-grow overflow-hidden">
+        <!-- Video section -->
+        <div
+          id="videoSection"
+          class="flex-none lg:flex-1 bg-white dark:bg-gray-800 w-full max-h-[40vh] lg:max-h-none lg:h-full flex flex-col transition-colors duration-300"
+        >
+          <!-- Video placeholder/player with responsive sizing on mobile, full height on desktop -->
+          <div
+            id="playerContainer"
+            class="w-full aspect-video lg:aspect-auto bg-gray-100 dark:bg-gray-900 flex items-center justify-center max-h-full lg:h-full relative flex-grow transition-colors duration-300"
+          >
+            <!-- Player will be created here -->
+            <div id="player" class="w-full h-full absolute top-0 left-0"></div>
+            <!-- Initial state with input -->
+            <div
+              id="videoInput"
+              class="text-center p-4 w-full max-w-md z-10 bg-white dark:bg-gray-800 rounded-lg shadow-sm dark:shadow-gray-900 transition-colors duration-300"
+            >
+              <h1
+                class="text-xl font-bold text-gray-700 dark:text-gray-200 mb-2 transition-colors duration-300"
+              >
+                Pinyin KTV
+              </h1>
+              <p
+                class="text-sm text-gray-600 dark:text-gray-400 mb-4 transition-colors duration-300"
+              >
+                Laowai-friendly lyrics for popular Chinese songs
+              </p>
+              <div class="flex flex-col gap-2">
+                <input
+                  type="text"
+                  id="youtubeUrl"
+                  class="w-full p-2 text-sm border dark:border-gray-600 rounded focus:outline-none focus:border-blue-300 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300"
+                  placeholder="Enter YouTube URL..."
+                />
+                <button
+                  id="loadVideo"
+                  class="bg-blue-500 dark:bg-blue-600 text-white py-2 px-3 rounded text-sm hover:bg-blue-600 dark:hover:bg-blue-700 transition-colors duration-300"
+                >
+                  Load Video
+                </button>
+              </div>
+              <div class="mt-4 text-left">
+                <p
+                  class="text-xs text-gray-500 dark:text-gray-500 mb-1 transition-colors duration-300"
+                >
+                  Or dive right in:
+                </p>
+                <a
+                  href="#"
+                  id="exampleSong"
+                  class="text-sm text-blue-600 dark:text-blue-400 hover:underline transition-colors duration-300 flex items-center"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-4 w-4 mr-1"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                    />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  孤勇者 Lonely Warrior - 陳奕迅 Eason Chan
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lyrics section - fills remaining space -->
+        <div
+          id="lyricsSection"
+          class="flex-grow flex flex-col overflow-hidden lg:flex-1 lg:border-l lg:border-gray-200 dark:lg:border-gray-700 lg:max-w-[500px] transition-colors duration-300"
+        >
+          <!-- Lyrics search container -->
+          <div
+            id="lyricsSearch"
+            class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 hidden h-full flex flex-col transition-colors duration-300"
+          >
+            <!-- Search input directly in lyrics container - fixed height -->
+            <div
+              class="p-3 border-b dark:border-gray-700 flex-none transition-colors duration-300"
+            >
+              <div class="flex gap-2">
+                <input
+                  type="text"
+                  id="artistSong"
+                  class="flex-grow p-2 text-sm border dark:border-gray-600 rounded focus:outline-none focus:border-blue-300 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300"
+                  placeholder="Enter artist or song name"
+                />
+                <button
+                  id="searchLyrics"
+                  class="bg-green-500 dark:bg-green-600 text-white py-2 px-3 rounded text-sm whitespace-nowrap hover:bg-green-600 dark:hover:bg-green-700 transition-colors duration-300"
+                >
+                  Search
+                </button>
+              </div>
+            </div>
+
+            <!-- Search results - fills remaining space with scrolling -->
+            <div id="searchResults" class="flex-grow overflow-y-auto p-2">
+              <!-- Results will be loaded here -->
+              <div
+                class="text-center text-gray-500 dark:text-gray-400 text-sm p-4 transition-colors duration-300"
+              >
+                Enter search terms above to find lyrics
+              </div>
+            </div>
+          </div>
+
+          <!-- Lyrics display container - fills all available space -->
+          <div
+            id="lyricsView"
+            class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 hidden overflow-y-auto p-3 h-full scroll-smooth transition-colors duration-300"
+          >
+            <!-- Lyrics with pinyin will be displayed here -->
           </div>
         </div>
       </div>
+
+      <!-- Loading YouTube iFrame API -->
+      <script src="https://www.youtube.com/iframe_api"></script>
+
+      <!-- Utility functions -->
+      <script src="utils.js"></script>
+
+      <!-- Pinyin conversion script -->
+      <script src="pinyin.js"></script>
+
+      <!-- Main application script -->
+      <script src="app.js"></script>
     </div>
-    
-    <!-- Lyrics section - fills remaining space -->
-    <div id="lyricsSection" class="flex-grow flex flex-col overflow-hidden lg:flex-1 lg:border-l lg:border-gray-200 dark:lg:border-gray-700 lg:max-w-[500px] transition-colors duration-300">
-      <!-- Lyrics search container -->
-      <div id="lyricsSearch" class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 hidden h-full flex flex-col transition-colors duration-300">
-        <!-- Search input directly in lyrics container - fixed height -->
-        <div class="p-3 border-b dark:border-gray-700 flex-none transition-colors duration-300">
-          <div class="flex gap-2">
-            <input type="text" id="artistSong" class="flex-grow p-2 text-sm border dark:border-gray-600 rounded focus:outline-none focus:border-blue-300 dark:focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:focus:ring-blue-800 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 transition-colors duration-300" 
-              placeholder="Enter artist or song name">
-            <button id="searchLyrics" class="bg-green-500 dark:bg-green-600 text-white py-2 px-3 rounded text-sm whitespace-nowrap hover:bg-green-600 dark:hover:bg-green-700 transition-colors duration-300">
-              Search
-            </button>
-          </div>
-        </div>
-        
-        <!-- Search results - fills remaining space with scrolling -->
-        <div id="searchResults" class="flex-grow overflow-y-auto p-2">
-          <!-- Results will be loaded here -->
-          <div class="text-center text-gray-500 dark:text-gray-400 text-sm p-4 transition-colors duration-300">
-            Enter search terms above to find lyrics
-          </div>
-        </div>
-      </div>
-      
-      <!-- Lyrics display container - fills all available space -->
-      <div id="lyricsView" class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 hidden overflow-y-auto p-3 h-full scroll-smooth transition-colors duration-300">
-        <!-- Lyrics with pinyin will be displayed here -->
-      </div>
-    </div>
-  </div>
-  
-  <!-- Loading YouTube iFrame API -->
-  <script src="https://www.youtube.com/iframe_api"></script>
-  
-  <!-- Utility functions -->
-  <script src="utils.js"></script>
-  
-  <!-- Pinyin conversion script -->
-  <script src="pinyin.js"></script>
-  
-  <!-- Main application script -->
-  <script src="app.js"></script>
-</div>
-</body>
+  </body>
 </html>
