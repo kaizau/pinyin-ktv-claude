@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Pinyin Karaoke Generator</title>
+  <!-- Tailwind CSS from CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Custom styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div class="container mx-auto p-4">
+    <h1 class="text-2xl font-bold mb-6 text-center">YouTube Pinyin Karaoke Generator</h1>
+    
+    <!-- Error messages container -->
+    <div id="errorContainer"></div>
+    
+    <!-- Main content container -->
+    <div class="flex flex-col md:flex-row gap-4">
+      <!-- Left/Top Panel - Video and Form -->
+      <div class="w-full md:w-1/2 bg-white p-4 rounded shadow sticky-top">
+        <form id="videoForm" class="mb-4">
+          <div class="mb-4">
+            <label for="youtubeUrl" class="block mb-2 font-medium">YouTube URL</label>
+            <input type="text" id="youtubeUrl" class="w-full p-2 border rounded" placeholder="https://www.youtube.com/watch?v=...">
+          </div>
+          <button type="submit" class="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">Load Video</button>
+        </form>
+        
+        <!-- YouTube video will be embedded here -->
+        <div id="player" class="w-full aspect-video bg-gray-200 flex items-center justify-center">
+          <p class="text-gray-500">YouTube video will appear here</p>
+        </div>
+        
+        <!-- Artist/Song info (initially hidden) -->
+        <div id="songInfo" class="mt-4 hidden">
+          <label for="artistSong" class="block mb-2 font-medium">Artist/Song</label>
+          <input type="text" id="artistSong" class="w-full p-2 border rounded">
+          <button id="searchLyrics" class="mt-2 bg-green-500 text-white py-2 px-4 rounded hover:bg-green-600">Search Lyrics</button>
+        </div>
+      </div>
+      
+      <!-- Right/Bottom Panel - Lyrics and Pinyin -->
+      <div id="lyricsPanel" class="w-full md:w-1/2 bg-white p-4 rounded shadow hidden">
+        <!-- Tabs navigation -->
+        <div class="flex border-b mb-4">
+          <button id="searchTab" class="py-2 px-4 font-medium text-blue-500 border-b-2 border-blue-500">Search Results</button>
+          <button id="lyricsTab" class="py-2 px-4 font-medium text-gray-500">Lyrics</button>
+        </div>
+        
+        <!-- Search results view -->
+        <div id="searchResults" class="overflow-y-auto max-h-[60vh]">
+          <!-- Search results will be populated here -->
+        </div>
+        
+        <!-- Lyrics view (initially hidden) -->
+        <div id="lyricsView" class="hidden overflow-y-auto max-h-[60vh]">
+          <!-- Lyrics with pinyin will be displayed here -->
+        </div>
+        
+        <!-- Playback controls (initially hidden) -->
+        <div id="playbackControls" class="mt-4 hidden">
+          <div class="flex items-center justify-center gap-2">
+            <button id="adjustEarlier" class="bg-gray-200 py-1 px-2 rounded">-0.5s</button>
+            <button id="adjustLater" class="bg-gray-200 py-1 px-2 rounded">+0.5s</button>
+            <span class="text-sm text-gray-500">Adjust timing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading YouTube iFrame API -->
+  <script src="https://www.youtube.com/iframe_api"></script>
+  
+  <!-- Utility functions -->
+  <script src="utils.js"></script>
+  
+  <!-- Pinyin conversion script -->
+  <script src="pinyin.js"></script>
+  
+  <!-- Main application script -->
+  <script src="app.js"></script>
+</body>
+</html>

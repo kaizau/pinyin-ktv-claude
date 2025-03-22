@@ -1,0 +1,36 @@
+/* Custom styles for YouTube Pinyin Karaoke Generator */
+
+.lyric-line {
+  transition: background-color 0.3s ease;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.lyric-line.active {
+  background-color: rgba(254, 240, 138, 0.7); /* yellow-100 with opacity */
+}
+
+/* Smooth scrolling for lyric panel */
+#lyricsView {
+  scroll-behavior: smooth;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .container {
+    padding: 8px;
+  }
+  
+  #player {
+    min-height: 200px;
+  }
+  
+  /* Keep video visible when scrolling on mobile */
+  .sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background-color: white;
+    padding-bottom: 8px;
+  }
+}
