@@ -41,12 +41,24 @@
   background-color: #f9fafb;
 }
 
-/* Keep video section always visible */
-.sticky-top {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background-color: white;
+/* Toolbar styling */
+.toolbar {
+  width: 100%;
+}
+
+.step {
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.step.active {
+  opacity: 1;
+  font-weight: 600;
+  color: #3b82f6; /* blue-500 */
+}
+
+.input-toolbar {
+  transition: all 0.3s ease;
 }
 
 /* Fade in animations */
@@ -59,28 +71,20 @@
   animation: fadeIn 0.3s ease-in;
 }
 
-/* Compact height when keyboard is open on mobile */
-@media (max-height: 600px) {
-  #lyricsView, #searchResults {
-    max-height: 200px !important;
-  }
+/* Slide animations for toolbars */
+@keyframes slideInDown {
+  from { transform: translateY(-100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
 
-/* Adjust for larger screens */
-@media (min-width: 768px) {
-  #lyricsView, #searchResults {
-    max-height: calc(100vh - 400px) !important;
-  }
-}
-
-/* Better contrast for current line */
-.lyric-line.active .chinese-text {
-  font-weight: bold;
+.slide-in {
+  animation: slideInDown 0.2s ease-out;
 }
 
 /* Hide scrollbars on some browsers but keep functionality */
 #lyricsView, #searchResults {
   scrollbar-width: thin;
+  height: calc(100vh - 200px);
 }
 
 #lyricsView::-webkit-scrollbar, #searchResults::-webkit-scrollbar {
@@ -90,4 +94,30 @@
 #lyricsView::-webkit-scrollbar-thumb, #searchResults::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
+}
+
+/* Better contrast for current line */
+.lyric-line.active .chinese-text {
+  font-weight: bold;
+}
+
+/* Compact height when keyboard is open on mobile */
+@media (max-height: 600px) {
+  #lyricsView, #searchResults {
+    height: 200px;
+  }
+}
+
+/* Adjust for larger screens */
+@media (min-width: 768px) {
+  body {
+    max-width: 768px;
+    margin: 0 auto;
+    border-left: 1px solid #e5e7eb;
+    border-right: 1px solid #e5e7eb;
+  }
+  
+  #lyricsView, #searchResults {
+    height: calc(100vh - 250px);
+  }
 }
