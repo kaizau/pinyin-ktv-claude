@@ -4,12 +4,14 @@ let currentLyrics = [];
 let timeOffset = 0;
 let currentStep = 'video'; // Tracks current step: 'video', 'lyrics', or 'player'
 
-// DOM elements
-const youtubeUrlInput = document.getElementById('youtubeUrl');
-const loadVideoButton = document.getElementById('loadVideo');
+// DOM elements - we'll refresh references to these elements later
+let youtubeUrlInput = document.getElementById('youtubeUrl');
+let loadVideoButton = document.getElementById('loadVideo');
 const videoInput = document.getElementById('videoInput');
-const artistSongInput = document.getElementById('artistSong');
-const searchLyricsButton = document.getElementById('searchLyrics');
+const playerContainer = document.getElementById('playerContainer');
+const playerElement = document.getElementById('player');
+let artistSongInput = document.getElementById('artistSong');
+let searchLyricsButton = document.getElementById('searchLyrics');
 const lyricsSearch = document.getElementById('lyricsSearch');
 const searchResults = document.getElementById('searchResults');
 const lyricsView = document.getElementById('lyricsView');
@@ -20,6 +22,14 @@ const currentTimeDisplay = document.getElementById('currentTime');
 const navVideo = document.getElementById('navVideo');
 const navLyrics = document.getElementById('navLyrics');
 const navPlayer = document.getElementById('navPlayer');
+
+// Function to refresh element references
+function refreshElementReferences() {
+  youtubeUrlInput = document.getElementById('youtubeUrl');
+  loadVideoButton = document.getElementById('loadVideo');
+  artistSongInput = document.getElementById('artistSong'); 
+  searchLyricsButton = document.getElementById('searchLyrics');
+}
 
 // Initialize YouTube API
 function onYouTubeIframeAPIReady() {
@@ -48,17 +58,19 @@ async function loadVideoMetadata(url) {
 
 // Create YouTube player
 function createYouTubePlayer(videoId) {
+  // If there's an existing player, destroy it first to prevent issues
   if (player) {
-    player.loadVideoById(videoId);
-    return;
+    player.destroy();
+    player = null;
   }
 
-  // Make sure the player div is empty
-  document.getElementById('player').innerHTML = '';
+  // Make sure the player div is clean
+  playerElement.innerHTML = '';
   
-  // Hide the video input and show the player
+  // Hide the video input form
   videoInput.classList.add('hidden');
 
+  // Create a new YouTube player
   player = new YT.Player('player', {
     height: '100%',
     width: '100%',
@@ -397,8 +409,8 @@ function displaySearchResults(results) {
   });
 }
 
-// Event Listeners
-loadVideoButton.addEventListener('click', async () => {
+// The main function to load a video
+async function loadVideo() {
   // Clear any previous errors
   document.getElementById('errorContainer').innerHTML = '';
   
@@ -414,8 +426,10 @@ loadVideoButton.addEventListener('click', async () => {
     return;
   }
   
-  // Show loading indicator
+  // Save the original input HTML
   const originalInput = videoInput.innerHTML;
+  
+  // Show loading indicator
   videoInput.innerHTML = '<div class="flex justify-center p-4"><div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div><div class="ml-3">Loading video...</div></div>';
   
   try {
@@ -428,28 +442,26 @@ loadVideoButton.addEventListener('click', async () => {
       lyricsView.innerHTML = '';
     }
     
-    // If there's an existing player, destroy it
-    if (player) {
-      player.destroy();
-      player = undefined;
-    }
-    
-    // Restore original input form first (but it will be hidden by createYouTubePlayer)
+    // Restore original input form structure first
     videoInput.innerHTML = originalInput;
     
-    // Get the fresh references again
-    const newYoutubeUrlInput = document.getElementById('youtubeUrl');
-    const newLoadVideoButton = document.getElementById('loadVideo');
+    // Refresh our element references
+    refreshElementReferences();
     
-    // Set the URL value
-    newYoutubeUrlInput.value = youtubeUrl;
+    // Set the URL value back
+    youtubeUrlInput.value = youtubeUrl;
+    
+    // Reattach event listeners
+    loadVideoButton.addEventListener('click', loadVideo);
+    youtubeUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        loadVideoButton.click();
+      }
+    });
     
     // Create YouTube player
     createYouTubePlayer(videoId);
-    
-    // Reattach event listeners
-    newLoadVideoButton.addEventListener('click', loadVideoButton.onclick);
-    newYoutubeUrlInput.addEventListener('keypress', youtubeUrlInput.onkeypress);
     
     // Populate artist/song field and move to lyrics step
     artistSongInput.value = metadata.title || '';
@@ -458,21 +470,29 @@ loadVideoButton.addEventListener('click', async () => {
     goToStep('lyrics');
   } catch (error) {
     showError('Error loading video: ' + error.message, 'errorContainer');
+    
     // Restore video input
     videoInput.innerHTML = originalInput;
     
-    // Get the fresh references again
-    const newYoutubeUrlInput = document.getElementById('youtubeUrl');
-    const newLoadVideoButton = document.getElementById('loadVideo');
+    // Refresh our element references
+    refreshElementReferences();
     
-    // Set the URL value
-    newYoutubeUrlInput.value = youtubeUrl;
+    // Set the URL value back
+    youtubeUrlInput.value = youtubeUrl;
     
     // Reattach event listeners
-    newLoadVideoButton.addEventListener('click', loadVideoButton.onclick);
-    newYoutubeUrlInput.addEventListener('keypress', youtubeUrlInput.onkeypress);
+    loadVideoButton.addEventListener('click', loadVideo);
+    youtubeUrlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        loadVideoButton.click();
+      }
+    });
   }
-});
+}
+
+// Attach the load video function to the button
+loadVideoButton.addEventListener('click', loadVideo);
 
 // Use debounce to prevent rapid fire search requests
 const debouncedSearchLyrics = debounce(async (query) => {
@@ -503,17 +523,33 @@ navVideo.addEventListener('click', () => {
   if (!navVideo.classList.contains('disabled')) {
     // Clear everything when going back to video
     if (currentStep === 'player' || currentStep === 'lyrics') {
+      // Clear lyrics
       currentLyrics = [];
       lyricsView.innerHTML = '';
       
       // Clear the player if it exists
       if (player) {
         player.destroy();
-        player = undefined;
+        player = null;
       }
+      
+      // Make sure the player element is clean
+      playerElement.innerHTML = '';
       
       // Show the video input form
       videoInput.classList.remove('hidden');
+      
+      // Refresh element references
+      refreshElementReferences();
+      
+      // Reattach event listeners
+      loadVideoButton.addEventListener('click', loadVideo);
+      youtubeUrlInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          loadVideoButton.click();
+        }
+      });
     }
     
     goToStep('video');
