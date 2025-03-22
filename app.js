@@ -132,12 +132,10 @@ function updateCurrentLyric() {
       if (index === currentIndex) {
         el.classList.add('active');
         
-        // Auto-scroll to keep current line visible with some context above
-        const containerHeight = lyricsView.clientHeight;
-        const scrollPosition = el.offsetTop - (containerHeight / 3);
-        lyricsView.scrollTo({
-          top: scrollPosition,
-          behavior: 'smooth'
+        // Use scrollIntoView for simpler, more reliable scrolling
+        el.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center' // Center the element vertically
         });
       } else {
         el.classList.remove('active');
@@ -276,7 +274,7 @@ function displayLyricsWithPinyin(lyrics) {
   lyricsView.innerHTML = '';
   currentLyrics = lyrics;
   
-  lyrics.forEach(line => {
+  lyrics.forEach((line, index) => {
     const lineElement = document.createElement('div');
     lineElement.className = 'lyric-line fade-in';
     
@@ -291,6 +289,18 @@ function displayLyricsWithPinyin(lyrics) {
     lineElement.appendChild(pinyinElement);
     lineElement.appendChild(chineseElement);
     lyricsView.appendChild(lineElement);
+    
+    // Add click event to jump to this timestamp in the video
+    lineElement.addEventListener('click', () => {
+      if (player) {
+        // Jump to this lyric's timestamp minus the offset
+        player.seekTo(line.startTime - timeOffset, true);
+        player.playVideo(); // Start playing from this point
+      }
+    });
+    
+    // Add a data attribute for the timestamp (useful for debugging)
+    lineElement.setAttribute('data-time', line.startTime);
   });
   
   // Go to player mode
