@@ -13,9 +13,6 @@ const searchLyricsButton = document.getElementById('searchLyrics');
 const lyricsSearch = document.getElementById('lyricsSearch');
 const searchResults = document.getElementById('searchResults');
 const lyricsView = document.getElementById('lyricsView');
-const tabBar = document.getElementById('tabBar');
-const searchTab = document.getElementById('searchTab');
-const lyricsTab = document.getElementById('lyricsTab');
 const playbackControls = document.getElementById('playbackControls');
 const adjustEarlierButton = document.getElementById('adjustEarlier');
 const adjustLaterButton = document.getElementById('adjustLater');
@@ -58,6 +55,9 @@ function createYouTubePlayer(videoId) {
     return;
   }
 
+  // Clear the videoInput content
+  document.getElementById('player').innerHTML = '';
+
   player = new YT.Player('player', {
     height: '100%',
     width: '100%',
@@ -65,11 +65,21 @@ function createYouTubePlayer(videoId) {
     playerVars: {
       autoplay: 0,
       controls: 1,
+      playsinline: 1, // Better for mobile
+      rel: 0,         // Don't show related videos
+      modestbranding: 1 // Reduce YouTube branding
     },
     events: {
+      'onReady': onPlayerReady,
       'onStateChange': onPlayerStateChange
     }
   });
+}
+
+// Player ready event handler
+function onPlayerReady(event) {
+  // You could autoplay here if desired
+  // event.target.playVideo();
 }
 
 // Handle player state changes
@@ -162,7 +172,6 @@ function goToStep(step) {
       videoInput.classList.remove('hidden');
       lyricsSearch.classList.add('hidden');
       lyricsView.classList.add('hidden');
-      tabBar.classList.add('hidden');
       
       // Hide player controls
       currentTimeDisplay.classList.add('hidden');
@@ -179,7 +188,6 @@ function goToStep(step) {
       videoInput.classList.add('hidden');
       lyricsSearch.classList.remove('hidden');
       lyricsView.classList.add('hidden');
-      tabBar.classList.add('hidden');
       
       // Hide player controls
       currentTimeDisplay.classList.add('hidden');
@@ -201,7 +209,6 @@ function goToStep(step) {
       videoInput.classList.add('hidden');
       lyricsSearch.classList.add('hidden');
       lyricsView.classList.remove('hidden');
-      tabBar.classList.remove('hidden');
       
       // Show player controls
       currentTimeDisplay.classList.remove('hidden');
@@ -285,12 +292,6 @@ function displayLyricsWithPinyin(lyrics) {
     lineElement.appendChild(chineseElement);
     lyricsView.appendChild(lineElement);
   });
-  
-  // Update tab appearance
-  searchTab.classList.remove('bg-blue-50', 'text-blue-500');
-  searchTab.classList.add('text-gray-500');
-  lyricsTab.classList.remove('text-gray-500');
-  lyricsTab.classList.add('bg-blue-50', 'text-blue-500');
   
   // Go to player mode
   goToStep('player');
@@ -442,37 +443,7 @@ navPlayer.addEventListener('click', () => {
   }
 });
 
-// Tab switching in player mode
-searchTab.addEventListener('click', () => {
-  if (currentStep === 'player') {
-    // Update style
-    searchTab.classList.add('bg-blue-50', 'text-blue-500');
-    searchTab.classList.remove('text-gray-500');
-    lyricsTab.classList.add('text-gray-500');
-    lyricsTab.classList.remove('bg-blue-50', 'text-blue-500');
-    
-    // Go back to search
-    goToStep('lyrics');
-  }
-});
-
-lyricsTab.addEventListener('click', () => {
-  if (currentStep === 'player' && lyricsSearch.classList.contains('hidden')) {
-    // No need to do anything, already in lyrics view
-    return;
-  }
-  
-  if (currentLyrics.length > 0) {
-    // Update style
-    lyricsTab.classList.add('bg-blue-50', 'text-blue-500');
-    lyricsTab.classList.remove('text-gray-500');
-    searchTab.classList.add('text-gray-500');
-    searchTab.classList.remove('bg-blue-50', 'text-blue-500');
-    
-    // Go to player
-    goToStep('player');
-  }
-});
+// Navigation is now fully handled by the top nav buttons
 
 // Timing adjustment controls
 adjustEarlierButton.addEventListener('click', () => {

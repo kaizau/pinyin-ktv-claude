@@ -85,10 +85,9 @@ input:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Hide scrollbars on some browsers but keep functionality */
+/* Scrollbar styling - thin and subtle */
 #lyricsView, #searchResults {
   scrollbar-width: thin;
-  height: calc(100vh - 200px);
 }
 
 #lyricsView::-webkit-scrollbar, #searchResults::-webkit-scrollbar {
@@ -105,10 +104,35 @@ input:focus {
   font-weight: bold;
 }
 
-/* Compact height when keyboard is open on mobile */
-@media (max-height: 600px) {
+/* Fixed max size for the YouTube player to ensure it doesn't push lyrics off-screen */
+#player {
+  min-height: 120px; /* Minimum height for the player */
+  max-height: 40vh; /* Maximum height as % of viewport */
+}
+
+/* YouTube iframe specific styling */
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Layout adjustments for small screens */
+@media (max-height: 500px) {
+  /* Reduce max player height on very small screens */
+  #videoSection {
+    max-height: 35vh;
+  }
+  
+  /* Smaller padding for lyrics */
   #lyricsView, #searchResults {
-    height: 200px;
+    padding: 0.5rem;
+  }
+  
+  /* Smaller line spacing */
+  .lyric-line {
+    margin-bottom: 4px;
+    padding: 2px 4px;
   }
 }
 
@@ -119,9 +143,5 @@ input:focus {
     margin: 0 auto;
     border-left: 1px solid #e5e7eb;
     border-right: 1px solid #e5e7eb;
-  }
-  
-  #lyricsView, #searchResults {
-    height: calc(100vh - 250px);
   }
 }
