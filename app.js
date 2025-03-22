@@ -365,7 +365,7 @@ function displayLyricsWithPinyin(lyrics) {
 }
 
 // Display search results
-function displaySearchResults(results) {
+function displaySearchResults(results, cleanedQuery = null) {
   searchResults.innerHTML = '';
   
   if (results.length === 0) {
@@ -376,7 +376,13 @@ function displaySearchResults(results) {
   // Add results header
   const headerElement = document.createElement('div');
   headerElement.className = 'text-xs text-gray-500 dark:text-gray-400 px-2 py-1 bg-gray-50 dark:bg-gray-700 transition-colors duration-300';
-  headerElement.textContent = `${results.length} results found`;
+  
+  if (cleanedQuery) {
+    headerElement.innerHTML = `${results.length} results found <span class="italic">(using filtered search: "${cleanedQuery}")</span>`;
+  } else {
+    headerElement.textContent = `${results.length} results found`;
+  }
+  
   searchResults.appendChild(headerElement);
   
   // Add each result
@@ -498,8 +504,19 @@ async function loadVideo() {
 // Attach the load video function to the button
 loadVideoButton.addEventListener('click', loadVideo);
 
+/**
+ * Helper function to clean search query by removing symbols and non-Chinese characters
+ * @param {string} query - Original search query
+ * @returns {string} - Cleaned search query with only Chinese characters and spaces
+ */
+function cleanSearchQuery(query) {
+  // Keep only Chinese characters and spaces
+  // Chinese character range: \u4e00-\u9fff
+  return query.replace(/[^\u4e00-\u9fff\s]/g, '').trim();
+}
+
 // Use debounce to prevent rapid fire search requests
-const debouncedSearchLyrics = debounce(async (query) => {
+const debouncedSearchLyrics = debounce(async (query, isRetry = false) => {
   if (!query) {
     showError('Please enter an artist or song name', 'errorContainer');
     return;
@@ -510,10 +527,23 @@ const debouncedSearchLyrics = debounce(async (query) => {
   
   try {
     const results = await searchLyrics(query);
-    displaySearchResults(results);
+    
+    // If no results found and not in retry mode, try a cleaned version
+    if (results.length === 0 && !isRetry) {
+      const cleanedQuery = cleanSearchQuery(query);
+      
+      // Only retry if cleaning actually changed something and there are still characters left
+      if (cleanedQuery !== query && cleanedQuery.length > 0) {
+        console.log(`No results found. Retrying with cleaned query: "${cleanedQuery}"`);
+        debouncedSearchLyrics(cleanedQuery, true);
+        return;
+      }
+    }
+    
+    displaySearchResults(results, isRetry ? query : null);
   } catch (error) {
     showError('Error searching lyrics: ' + error.message, 'errorContainer');
-    searchResults.innerHTML = '<p class="text-red-500 p-4 text-center text-sm">Error searching. Please try again.</p>';
+    searchResults.innerHTML = '<p class="text-red-500 dark:text-red-400 p-4 text-center text-sm transition-colors duration-300">Error searching. Please try again.</p>';
   }
 }, 500);
 
